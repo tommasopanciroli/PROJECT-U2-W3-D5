@@ -5,38 +5,16 @@ const header = {
   Authorization: `Bearer ${tokenAut}`,
   'Content-Type': 'application/json',
 }
+console.log(header)
 
 const currentYear = document.getElementById('current-year')
 currentYear.innerText = new Date().getFullYear()
 
 const crudazonURL = 'https://striveschool-api.herokuapp.com/api/product/'
 
-const genProdCards = function (product) {
-  const prodList = document.getElementById('product-row')
-  prodList.innerHTML = ''
-  product.forEach((products) => {
-    const cardHTML = `
-          <div class="col-md-4">
-            <div class="card mb-4">
-              <a href="dettaglio.html?id=${products._id}">
-                <img src="${products.imageUrl}" class="card-img-top" alt="${products.name}">
-              </a>
-              <div class="card-body">
-                <h5 class="card-title">${products.name}</h5>
-                <p class="card-text">${products.description}</p>
-                <p class="card-text"><strong>€${products.price}</strong></p>
-                <button onclick="editProduct('${products._id}')" class="btn">Modifica</button>
-              </div>
-            </div>
-          </div>
-        `
-    prodList.innerHTML += cardHTML
-  })
-}
-
-fetch(`${crudazonURL}`, {
-  headers: header,
+fetch(crudazonURL, {
   method: 'GET',
+  headers: header,
 })
   .then((response) => {
     console.log('RESPONSE', response)
@@ -46,17 +24,27 @@ fetch(`${crudazonURL}`, {
       throw new Error('Errore nel recupero della risposta dal server')
     }
   })
-  .then((products) => {
-    genProdCards(products)
-    console.log(genProdCards)
-  })
+  .then((arrayOfProducts) => {
+    console.log('arrayOfProducts', arrayOfProducts)
 
+    const row = document.getElementById('products-row')
+    arrayOfProducts.forEach((product) => {
+      const newCol = document.createElement('div')
+      newCol.classList.add('col', 'col-12', 'col-md-6', 'col-lg-4')
+      newCol.innerHTML = `
+            <div class="card">
+                <img src="https://www.azzurrasport.eu/pub/media/catalog/product/cache/0b8817121aedd409f092350af4c5165e/1/1/11966-ea7-scarpe-uomo-pelle-tinta-unita-aquila-00001_0.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">${product.name}</h5>
+                    <p class="card-text">${product.description}</p>
+                    <p class="card-text">${product.price}€ </p>
+                    <a href="./details.html?concertId=${product._id}" class="btn btn-primary">Vai ai dettagli!</a>
+                </div>
+            </div>
+        `
+      row.appendChild(newCol)
+    })
+  })
   .catch((error) => {
     console.log('ERROR', error)
   })
-
- const editProd = function (productId) {
-    window.location.href = `back-office.html?id=${productId}`;
-  }
-  
-  window.onload = fetchProducts;
